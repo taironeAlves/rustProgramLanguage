@@ -1,3 +1,8 @@
+use regex::Regex;
+use std::env;
+use std::fs;
+use text_colorizer::*;
+
 #[derive(Debug)]
 struct Arguments {
     target: String,
@@ -6,18 +11,13 @@ struct Arguments {
     output: String,
 }
 
-use text_colorizer::*;
+fn main() {
+    let args: Arguments = parse_args();
 
-fn print_usage() {
-    eprintln!(
-        "{} - alterar ocorrências de uma string para outra",
-        "quickreplace".green()
-    );
+    read_file(&args)
 
-    eprintln!("Use: quickreplace <target> <replacement> <INPUT> <OUTPUT>");
+    // println!("{:?}", args);
 }
-
-use std::env;
 
 fn parse_args() -> Arguments {
     let args: Vec<String> = env::args().skip(1).collect();
@@ -39,18 +39,16 @@ fn parse_args() -> Arguments {
     }
 }
 
-use std::fs;
-use std::os::windows::process;
+fn print_usage() {
+    eprintln!(
+        "{} - alterar ocorrências de uma string para outra",
+        "quickreplace".green()
+    );
 
-fn main() {
-    let args = parse_args();
-
-    copy_file(&args)
-
-    // println!("{:?}", args);
+    eprintln!("Use: quickreplace <target> <replacement> <INPUT> <OUTPUT>");
 }
 
-fn copy_file(args: &Arguments) {
+fn read_file(args: &Arguments) {
     let data = match fs::read_to_string(&args.filename) {
         Ok(v) => v,
         Err(e) => {
@@ -64,6 +62,31 @@ fn copy_file(args: &Arguments) {
         }
     };
 
+    write_file(&args, &replace_file(&args, &data));
+}
+
+fn replace_file(args: &Arguments, data: &String) -> String {
+    let resp = match replaces(&args.target, &args.replacement, &data) {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!(
+                "{} Falha ao sobrescrever o text: {:?}",
+                "Error:".red().bold(),
+                e
+            );
+            std::process::exit(1);
+        }
+    };
+
+    resp
+}
+
+fn replaces(target: &str, replacement: &str, text: &str) -> Result<String, regex::Error> {
+    let regex = Regex::new(target)?;
+    Ok(regex.replace_all(text, replacement).to_string())
+}
+
+fn write_file(args: &Arguments, data: &String) {
     match fs::write(&args.output, &data) {
         Ok(_) => {}
         Err(e) => {
