@@ -1,11 +1,8 @@
 fn main() {
     println!("Hello, world!");
+    let mut s = "tairone".to_string();
+    let t = s;
+    s = "tabi".to_string();
 
-    let mut i: i32 = 1;
-
-    let mut a = "tairone";
-    let b = &a;
-    a = 1;
-     
-     let c = &a;
+    let s = "tab".to_string();
 }

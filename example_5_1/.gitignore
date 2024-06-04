@@ -1,0 +1,23 @@
+# Ignore artifacts and generated files
+/target/
+**/Cargo.lock
+
+# Ignore editor and IDE files
+.idea/
+.vscode/
+*.swp
+*~
+
+# Ignore binary files
+*.exe
+*.out
+*.o
+*.d
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore other temporary files
+*.log
+*.tmp
